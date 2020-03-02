@@ -6,6 +6,8 @@
 # Limitation:
 #   - It currently doesn't handle sticky-bits, only r, w,
 #     and e.
+#   - Hidden files and directories are also not handled
+#     by this script
 
 
 # Sets home directory from where the directory tree starts, To abstract absolute path
