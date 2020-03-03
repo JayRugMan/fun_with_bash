@@ -6,8 +6,6 @@
 # Limitation:
 #   - It currently doesn't handle sticky-bits, only r, w,
 #     and e.
-#   - Hidden files and directories are also not handled
-#     by this script
 
 
 # Sets home directory from where the directory tree starts, To abstract absolute path
@@ -18,6 +16,6 @@ sourcepermFile="$HOME/${homedir##*/}_$(date +%y%m%d_%H%M).file" # file for sourc
 # Finds all objects and checks the stats, echoing the permission number bits
 # in context of the chmod command and directs the constructed chmod command
 # to the sourcepermFile to be sourced to restore permissions
-find . -exec stat -c"chmod %a \"$homedir/%n\" 2>/dev/null" {} + | sed 's/\/\.//g' > ${sourcepermFile}
+find . -exec stat -c"chmod %a \"$homedir/%n\" 2>/dev/null" {} + | sed 's/\/\.\//\//g; s/\/\."/"/g' > ${sourcepermFile}
 
 echo -e "\nsource $sourcepermFile as root to restore mod bits for files in $homedir\n"
