@@ -4,8 +4,7 @@
 # which the script is issued into a file that simply needs
 # to be sourced to restore permissions.
 # Limitation:
-#   - It currently doesn't handle sticky-bits, only r, w,
-#     and e.
+#   - It currently hasn't been tested with sticky-bits
 
 
 # Sets home directory from where the directory tree starts, To abstract absolute path
