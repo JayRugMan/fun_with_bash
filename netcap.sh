@@ -38,7 +38,7 @@ case $option in
     exit 0
     ;;
   -i )
-    if [[ -z ${2} ]] || [[ ! ${ifacesarray["$iface"]} ]] ; then
+    if [[ -z ${2} ]] || [[ ! ${ifacesarray["$2"]} ]] ; then
       usage
     else
       iface=${2}
