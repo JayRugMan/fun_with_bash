@@ -1,7 +1,7 @@
 #!/bin/bash
 # This script is to bring various hosts files with bad sites, like ads
 # porn, gambling from around the web, download them, then compile them
-# into one file for dnsmask to use
+# into one file for dnsmasq to use
 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
