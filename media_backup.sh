@@ -13,6 +13,9 @@ THEDATE=$(date +%Y%m%d-%H%M)
 SOURCE_DIR="/home/plex"
 TARGET_DIR="/mnt/backups"
 ARCHIVE_FILE="$TARGET_DIR/media_backups_plex01_$THEDATE.tgz"
+PLEX_CONF_SRC_DIR="/var/lib/plexmediaserver/Library/Application*Support/"
+PLEX_CONF_TGT_DIR="/mnt/backups/configs/plex"
+PLEX_CONF_ARCHIVE_FILE="Plex_Media_Server_configs_$THEDATE.tgz"
 LOGFILE="/mnt/backups/media_bu.log"
 
 ### End Customization ###
@@ -36,22 +39,42 @@ function get_new_files() {
 }
 
 
-function main() {
-  # Main Function
+function media_backup() {
+  # Media backup Function
   cd $SOURCE_DIR
   filesString="$(get_new_files)"
   if [[ -z $filesString ]]; then 
     exit 1
   else
-    echo "$THEDATE:  Starting Backup" >> $LOGFILE
+    echo "$THEDATE:  Starting media file backup" >> $LOGFILE
     echo "tar czf $ARCHIVE_FILE $filesString" | /bin/sh
     if [[ $? -eq 0 ]]; then
       echo "successfully archived the following files into $ARCHIVE_FILE:" >> $LOGFILE
       printf "$(echo "$filesString" | sed 's/^"//g;s/" "/\\n/g;s/"//g')\n\n" >> $LOGFILE
     else
-      echo "Backup failed" >> $LOGFILE
+      echo -e "Media file backup failed\n" >> $LOGFILE
     fi
   fi
+}
+
+
+function config_backup() {
+  # Plex Configuration Backup function
+  cd $PLEX_CONF_SRC_DIR
+  echo "$THEDATE:  Starting Plex Media Server configuration backup" >> $LOGFILE
+  echo "tar czf $PLEX_CONF_TGT_DIR/$PLEX_CONF_ARCHIVE_FILE Plex\ Media\ Server/" | /bin/sh
+  if [[ $? -eq 0 ]]; then
+    echo -e "successfully archived Plex Media Server configurations into $PLEX_CONF_TGT_DIR/$PLEX_CONF_ARCHIVE_FILE\n" >> $LOGFILE
+  else
+    echo -e "Plex Media Server configuration backup failed\n" >> $LOGFILE
+  fi
+}
+
+
+function main() {
+  # Main Function
+  media_backup
+  config_backup
 }
 
 main
