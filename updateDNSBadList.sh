@@ -14,7 +14,8 @@ NAUGHTY_LIST_FILE="/etc/badList_hosts"
 REMOTE_HOSTS_FILES=(https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/gambling-porn-social/hosts https://www.github.developerdan.com/hosts/lists/ads-and-tracking-extended.txt)
 LOCAL_HOSTS_FILES=(gamPorSo_hosts ads-and-tracking-extended.txt badList_hosts.bak)
 COMPILATION_FILE="HostsBlockCompilation"
-WHITELIST="$COMPILE_DIR/dnsWhite.lst"
+WHITELIST_FIXED="$COMPILE_DIR/dnsWhite_fixed.lst"
+WHITELIST_REGEX="$COMPILE_DIR/dnsWhite_regex.lst"
 
 ### END Customization ###
 
@@ -35,8 +36,11 @@ function catcatonate_compile() {
     catString="$catString $COMPILE_DIR/$i"
   done
   # filters out hostnames from the whitelist if it exists
-  if [[ -f $WHITELIST ]]; then
-    catString="$catString | grep -vFf $WHITELIST "
+  if [[ -f $WHITELIST_FIXED ]]; then
+    catString="$catString | grep -vFf $WHITELIST_FIXED "
+  fi
+  if [[ -f $WHITELIST_REGEX ]]; then
+    catString="$catString | grep -vEf $WHITELIST_REGEX "
   fi
   /bin/cp $COMPILE_DIR/$COMPILATION_FILE.2.bak $COMPILE_DIR/$COMPILATION_FILE.3.bak
   /bin/cp $COMPILE_DIR/$COMPILATION_FILE.bak $COMPILE_DIR/$COMPILATION_FILE.2.bak
