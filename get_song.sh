@@ -34,21 +34,20 @@ function getOptions() {
         ;;
       'h')
         usage
-        exit 1
+        echo exit 1
         ;;
       ?)
         usage
-        exit 1
+        echo exit 1
         ;;
     esac
   done
-  shift "$((OPTIND -1))"
-  if [[ ${has_song} -ne 1 ]]; then
-    usage "No song provided"
-    exit 1
-  elif [[ ${has_artist} -ne 1 ]]; then
-    usage "No artist provided"
-    exit 1
+  if [[ $has_artist -ne 1 ]]; then
+    usage "No Artist Provided"
+    echo exit 1
+  elif [[ $has_song -ne 1 ]]; then
+    usage "No Song Provided"
+    echo exit 1
   fi
 }
 
