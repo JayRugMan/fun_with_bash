@@ -70,8 +70,8 @@ function to_mp3() {
                   -metadata track=$the_track \
                   -metadata disc=1 \
                   -metadata album_artist="$THE_ALBUM_ARTIST" \
-                  rickroll.mp3 >/dev/null 2>&1
-  echo " - Converted to $mp3_file"
+                  "$mp3_file" >/dev/null 2>&1
+  echo " - Converted to \"$mp3_file\""
 }
 
 
@@ -106,9 +106,8 @@ function main() {
                             --restrict-filenames "$url" \
                             >/dev/null 2>&1
   if [[ $? -eq 0 ]]; then
-    new_file="$(ls -1tr | tail -1)"
     echo -e "\b\b\b\b\b\b\b\b\b\bcomplete  "
-
+    new_file="$(ls | grep -E 'm4a$')"
     to_mp3 "$next_track" "$new_file" "$album"
     archive_m4a "$new_file" "$m4a_dir"
   else
