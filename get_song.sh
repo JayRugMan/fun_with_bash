@@ -98,6 +98,7 @@ function main() {
   # Go to the target directory, download the video from YouTube, convert it to
   # MP3 format with metadata, and archive the M4A file
   cd "$target_dir"
+  echo " - \"${THE_SONG}\" by ${THE_ARTIST} found at ${url}"
   echo " - Changed to $target_dir"
 
   /usr/local/bin/youtube-dl -f 'bestaudio[ext=m4a]' \
