@@ -98,20 +98,21 @@ function main() {
   # Go to the target directory, download the video from YouTube, convert it to
   # MP3 format with metadata, and archive the M4A file
   cd "$target_dir"
-  echo " - \"${THE_SONG}\" by ${THE_ARTIST} found at ${url}"
   echo " - Changed to $target_dir"
+  echo " - \"${THE_SONG}\" by ${THE_ARTIST} found at ${url} "
+  echo -n " - Download started..."
 
   /usr/local/bin/youtube-dl -f 'bestaudio[ext=m4a]' \
                             --restrict-filenames "$url" \
                             >/dev/null 2>&1
   if [[ $? -eq 0 ]]; then
     new_file="$(ls -1tr | tail -1)"
-    echo " - Downloaded $url as $new_file"
+    echo -e "\b\b\b\b\b\b\b\b\b\bcomplete  "
 
     to_mp3 "$next_track" "$new_file" "$album"
     archive_m4a "$new_file" "$m4a_dir"
   else
-    echo " - Download Failed"
+    echo -e "\b\b\b\b\b\b\b\b\b\bfailed    "
   fi
 }
 
