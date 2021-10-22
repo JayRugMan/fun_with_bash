@@ -37,20 +37,20 @@ function getOptions() {
         ;;
       'h')
         usage
-        exit 1
+        echo exit 1
         ;;
       ?)
         usage
-        exit 1
+        echo exit 1
         ;;
     esac
   done
   if [[ "$has_artist" -ne 1 ]]; then
     usage "No Artist Provided"
-    exit 1
+    echo exit 1
   elif [[ "$has_song" -ne 1 ]]; then
     usage "No Song Provided"
-    exit 1
+    echo exit 1
   fi
 }
 
@@ -86,7 +86,7 @@ function archive_m4a() {
 
 function main() {
   ## ARGS
-  THE_ARTIST=""; THE_SONG=""; getOptions ${@}
+  THE_ARTIST=""; THE_SONG=""; getOptions "${@}"
   THE_ALBUM_ARTIST="Various Artists"
   target_dir="/home/jason/music/Mixed/ElectroString/"
   m4a_dir="/home/jason/music/m4aFiles/"
@@ -115,4 +115,4 @@ function main() {
 }
 
 
-main ${@}
+main "${@}"
