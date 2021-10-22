@@ -45,10 +45,10 @@ function getOptions() {
         ;;
     esac
   done
-  if [[ $has_artist -ne 1 ]]; then
+  if [[ "$has_artist" -ne 1 ]]; then
     usage "No Artist Provided"
     exit 1
-  elif [[ $has_song -ne 1 ]]; then
+  elif [[ "$has_song" -ne 1 ]]; then
     usage "No Song Provided"
     exit 1
   fi
