@@ -37,20 +37,20 @@ function getOptions() {
         ;;
       'h')
         usage
-        echo exit 1
+        exit 1
         ;;
       ?)
         usage
-        echo exit 1
+        exit 1
         ;;
     esac
   done
   if [[ $has_artist -ne 1 ]]; then
     usage "No Artist Provided"
-    echo exit 1
+    exit 1
   elif [[ $has_song -ne 1 ]]; then
     usage "No Song Provided"
-    echo exit 1
+    exit 1
   fi
 }
 
@@ -79,7 +79,7 @@ function archive_m4a() {
   # Move the downloaded m4a file to archive m4a_dir
   the_file="${1}"
   the_dir="${2}"
-  mv -v $the_file $the_dir
+  mv -v "$the_file" "$the_dir"
   echo " - Archived $the_file to $the_dir"
 }
 
@@ -103,11 +103,15 @@ function main() {
   /usr/local/bin/youtube-dl -f 'bestaudio[ext=m4a]' \
                             --restrict-filenames "$url" \
                             >/dev/null 2>&1
-  new_file="$(ls -1tr | tail -1)"
-  echo " - Downloaded $url as $new_file"
+  if [[ $? -eq 0 ]]; then
+    new_file="$(ls -1tr | tail -1)"
+    echo " - Downloaded $url as $new_file"
 
-  to_mp3 "$next_track" "$new_file" "$album"
-  archive_m4a "$new_file" "$m4a_dir"
+    to_mp3 "$next_track" "$new_file" "$album"
+    archive_m4a "$new_file" "$m4a_dir"
+  else
+    echo " - Download Failed"
+  fi
 }
 
 
