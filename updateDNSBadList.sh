@@ -12,7 +12,7 @@ NAUGHTY_LIST_FILE="/etc/badList_hosts"
 # -- Make sure the index of each remote hosts file lines up with each local hosts file, 
 # and that there are the same or more items in the Local Hosts File
 REMOTE_HOSTS_FILES=(https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/gambling-porn-social/hosts https://www.github.developerdan.com/hosts/lists/ads-and-tracking-extended.txt)
-LOCAL_HOSTS_FILES=(gamPorSo_hosts ads-and-tracking-extended.txt badList_hosts.bak)
+LOCAL_HOSTS_FILES=(gamPorSo_hosts ads-and-tracking-extended.txt badList_hosts.bak blacklist.txt)
 COMPILATION_FILE="HostsBlockCompilation"
 WHITELIST_FIXED="$COMPILE_DIR/dnsWhite_fixed.lst"
 WHITELIST_REGEX="$COMPILE_DIR/dnsWhite_regex.lst"
@@ -24,7 +24,7 @@ function gather_remote_hosts() {
   # Gathers hosts files listed in remoteHostsFiles array
   remoteCount=$((${#REMOTE_HOSTS_FILES[@]}-1))
   for i in $(seq 0 ${remoteCount}); do
-    /usr/bin/wget -O $COMPILE_DIR/${LOCAL_HOSTS_FILES[$i]} ${REMOTE_HOSTS_FILES[$i]}
+    /usr/bin/wget --no-check-certificate -O $COMPILE_DIR/${LOCAL_HOSTS_FILES[$i]} ${REMOTE_HOSTS_FILES[$i]}
   done
 }
 
