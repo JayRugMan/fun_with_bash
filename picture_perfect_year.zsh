@@ -62,3 +62,6 @@ function main() {
   make_dir
   move_them_pics
 }
+
+
+main
