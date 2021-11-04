@@ -10,7 +10,7 @@ function get_pic_info() {
   # loads PICTURES array with picture name and date as key and value
   for the_pic in $(ls | grep -i "jpg\|png"); do
     pic_type=${the_pic##*.}
-    if [[ ${pic_type:l} == "jpg" ]]; then
+    if [[ ${pic_type:l} == "jpg" ]] || [[ ${pic_type:l} == "jpeg" ]]; then
       the_y=$(exif -t DateTimeOriginal --machine-readable $the_pic |
                awk -F':' '{print $1}'
               )
