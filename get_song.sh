@@ -37,20 +37,20 @@ function getOptions() {
         ;;
       'h')
         usage
-        echo exit 1
+        exit 1
         ;;
       ?)
         usage
-        echo exit 1
+        exit 1
         ;;
     esac
   done
   if [[ "$has_artist" -ne 1 ]]; then
     usage "No Artist Provided"
-    echo exit 1
+    exit 1
   elif [[ "$has_song" -ne 1 ]]; then
     usage "No Song Provided"
-    echo exit 1
+    exit 1
   fi
 }
 
