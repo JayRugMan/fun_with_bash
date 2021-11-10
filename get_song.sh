@@ -92,7 +92,7 @@ function main() {
   m4a_dir="/home/jason/music/m4aFiles/"
   album="Electrostring"
   next_track="$(ls -1 $target_dir | awk 'END{printf "%02i\n", ($1+1)}')"
-  url="$(/home/jason/bin/youtubeSnD.sh "${THE_ARTIST} ${THE_SONG}")"
+  url="$(/home/jason/bin/youtubeSearch.sh "${THE_ARTIST} ${THE_SONG}")"
   ##
 
   # Go to the target directory, download the video from YouTube, convert it to
