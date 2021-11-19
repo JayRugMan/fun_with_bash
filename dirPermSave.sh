@@ -49,7 +49,7 @@ the_output_file="/tmp/dir_permissions_backup_${the_date_time}.txt"  # output fil
 if cd ${base_dir}; then
   echo "## source this file in \"${base_dir}\" to recover permissions and ownership" > ${the_output_file}
     # finds directories in the base directory, skipping .snapshot directories, and loads output file with current permissions
-  find "${base_dir}" -maxdepth $dir_depth -mindepth 1 -name .snapshot -prune -o -type d -exec stat -c"chown %U:%G %n" {} \; -exec stat -c"chmod %a %n" {} \; >> ${the_output_file}
+  find . -maxdepth $dir_depth -mindepth 1 -name .snapshot -prune -o -type d -exec stat -c"chown %U:%G %n" {} \; -exec stat -c"chmod %a %n" {} \; >> ${the_output_file}
     # sed to add 00 before permissions without special permissions bit so any special bit can be removed when restored from backup
   sed -i 's/^chmod [0-7][0-7][0-7] /00&/g; s/^00chmod /chmod 00/g' ${the_output_file}
   echo -e "-- Rollback source file is ${the_output_file}\n--- (Source in directory specified on the file's first line)"
