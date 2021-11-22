@@ -29,6 +29,33 @@ EOF
 }
 
 
+function get_keys() {
+  # gets the keys for an ordered array because order
+  # matters and associative arrays are unordered
+  code_str="${@}"
+  key_count=${#THE_CODE}
+  for i in $(seq 1 ${key_count}); do
+    # appents the first value of the string to the array
+    THE_KEYS+=(${code_str%% *})
+    # removes the first two values of the string
+    code_str="${code_str#* }" ; code_str="${code_str#* }"
+  done
+}
+
+
+function get_code() {
+  # gets the code from the optarg 
+  optarg="${@}"
+  if [[ -f "$optarg" ]]; then
+    code_string=( $(cat "$optarg") )
+  else
+    code_string=( $(echo $optarg) )
+  fi
+  THE_CODE=( $(echo $code_string) )
+  get_keys "${code_string}"
+}
+
+
 function getOptions() {
   local OPTIND OPTION b c h
   while getopts "b:c:h" OPTION; do
@@ -38,11 +65,7 @@ function getOptions() {
         has_book=1
         ;;
       'c') # code file or string
-        if [[ -f "$OPTARG" ]]; then
-          THE_CODE=( $(cat "$OPTARG") )
-        else
-          THE_CODE=( $(echo $OPTARG) )
-        fi
+        get_code "$OPTARG"
         has_code=1
         ;;
       'h')
@@ -67,15 +90,15 @@ function getOptions() {
 
 function main() {
   ## Args
-  declare THE_BOOK; declare -A THE_CODE; getOptions "${@}"
+  declare THE_BOOK; declare -A THE_CODE; declare -a THE_KEYS; getOptions "${@}"
   decyphered=""
   line_count=1
 
-  for line_num letter_num in ${(kv)THE_CODE[@]}; do
+  for key in ${THE_KEYS[@]}; do
     echo "${THE_BOOK}" | while read str_line; do
-      if [[ "$line_num" == "$line_count" ]]; then
-        ((letter_num--))
-        decyphered="${str_line:${letter_num}:1}${decyphered}"
+      if [[ "$key" == "$line_count" ]]; then
+        ((THE_CODE[$key]--))
+        decyphered="${decyphered}${str_line:${THE_CODE[$key]}:1}"
       fi
       ((line_count++))
     done
