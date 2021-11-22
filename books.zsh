@@ -35,9 +35,9 @@ function get_keys() {
   code_str="${@}"
   key_count=${#THE_CODE}
   for i in $(seq 1 ${key_count}); do
-    # appents the first value of the string to the array
+    # appends the first value of the string (the key) to the keys array
     THE_KEYS+=(${code_str%% *})
-    # removes the first two values of the string
+    # removes the first two values (first key/value pair) of the string
     code_str="${code_str#* }" ; code_str="${code_str#* }"
   done
 }
@@ -88,12 +88,10 @@ function getOptions() {
 }
 
 
-function main() {
-  ## Args
-  declare THE_BOOK; declare -A THE_CODE; declare -a THE_KEYS; getOptions "${@}"
+function decypher() {
+  # Magic happens here
   decyphered=""
   line_count=1
-
   for key in ${THE_KEYS[@]}; do
     echo "${THE_BOOK}" | while read str_line; do
       if [[ "$key" == "$line_count" ]]; then
@@ -106,6 +104,16 @@ function main() {
   done
 
   echo -e "  MESSAGE:\n${decyphered}"
+}
+
+
+function main() {
+  # MAIN FUNCTION
+  declare THE_BOOK
+  declare -A THE_CODE
+  declare -a THE_KEYS
+  getOptions "${@}"
+  decypher
 }
 
 
