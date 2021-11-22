@@ -14,27 +14,46 @@ function get_pic_info() {
   # then identify is tried. If both fail, then "unknown_date" is assigned
   # This function can also handle video files.
   IFS=$'\n'
-  for the_pic in $(ls | grep -i "jpg\|jpeg\|png\|gif\|mp3\|mp4\|wav\|mov"); do
-    pic_type="${the_pic##*.}"
-    if [[ ${pic_type:l} == "jpg" ]] || [[ ${pic_type:l} == "jpeg" ]]; then
-      the_y="$(exif -t DateTimeOriginal --machine-readable "$the_pic" 2>/dev/null |
+
+  ## Add file-types below
+  pic_ext_array_jpg=( jpg jpeg )
+  pic_ext_array_other=( png gif )
+  vid_ext_array=( jpg jpeg png gif mp3 mp4 wav mov mpg flv avi )
+  ##
+
+  # String made from arrays for grep search
+  grep_search_filter="${pic_ext_array_jpg[@]}${pic_ext_array_other[@]}${vid_ext_array[@]}"
+  no_exif=false
+
+  for the_file in $(ls | grep -i "${grep_search_filter}"); do
+    file_type="${the_file##*.}"
+
+    if [[ "${pic_ext_array_jpg[@]}" =~ ${file_type:l} ]]; then
+      the_y="$(exif -t DateTimeOriginal --machine-readable "$the_file" 2>/dev/null |
                awk -F':' '{print $1}'
                )"
+      if [[ -z "$the_y" ]]; then
+        no_exif=true
+      fi
     fi
-    if [[ ${pic_type:l} == "mp3" ]] || [[ ${pic_type:l} == "mp4" ]] || [[ ${pic_type:l} == "wav" ]] || [[ ${pic_type:l} == "mov" ]] ; then
-      the_y="$(ffprobe -hide_banner "$the_pic" 2>&1 |
-               awk -F'( |-){1,}' '/creation_time/ || / date / {print $4; exit}'
-              )"
-    fi
-    if [[ ${pic_type:l} == "png" ]] || [[ ${pic_type:l} == "gif" ]] || [[ -z "$the_y" ]]; then
-      the_y="$(identify -verbose "$the_pic" 2>/dev/null |
+
+    if [[ "${pic_ext_array_other[@]}" =~ ${file_type:l} ]] || ${no_exif} ; then
+      the_y="$(identify -verbose "$the_file" 2>/dev/null |
                awk -F'( |-){1,}' '/date:create:/ {print $3}'
               )"
     fi
+
+    if [[ "${vid_ext_array[@]}" =~ "${file_type:l}" ]]; then
+      the_y="$(ffprobe -hide_banner "$the_file" 2>&1 |
+               awk -F'( |-){1,}' '/creation_time/ || / date / {print $4; exit}'
+              )"
+    fi
+
     if [[ -z "$the_y" ]]; then
       the_y="unknown_date"
     fi
-    PICTURES[$the_pic]="$the_y"
+
+    PICTURES[$the_file]="$the_y"
     unset the_y
   done
   unset IFS
