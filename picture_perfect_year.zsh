@@ -17,12 +17,12 @@ function get_pic_info() {
 
   ## Add file-types below
   pic_ext_array_jpg=( jpg jpeg )
-  pic_ext_array_other=( png gif )
-  vid_ext_array=( jpg jpeg png gif mp3 mp4 wav mov mpg flv avi )
+  pic_ext_array_other=( png gif bmp )
+  vid_ext_array=( mp3 mp4 wav mov mpg flv avi )
   ##
 
   # String made from arrays for grep search
-  grep_search_filter="${pic_ext_array_jpg[@]}${pic_ext_array_other[@]}${vid_ext_array[@]}"
+  grep_search_filter="$(echo "${pic_ext_array_jpg[@]} ${pic_ext_array_other[@]} ${vid_ext_array[@]}" | sed 's/ /\\|/g')"
   no_exif=false
 
   for the_file in $(ls | grep -i "${grep_search_filter}"); do
