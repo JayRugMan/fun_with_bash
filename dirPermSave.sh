@@ -41,7 +41,7 @@ fi
 
 base_dir="${@}"  # remaining parameters, which should be a directory
 the_date_time="$(date +%Y%m%d-%H%M%S)"  # date/time for file name YYYYMMDD-HHMMSS
-the_output_file="/tmp/dir_permissions_backup_${the_date_time}.txt"  # output file
+the_output_file="/var/tmp/dir_permissions_backup_${the_date_time}.txt"  # output file
 ##
 
 
