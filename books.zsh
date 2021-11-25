@@ -44,7 +44,7 @@ function get_keys() {
 
 
 function get_code() {
-  # gets the code from the optarg 
+  # gets the code from the optarg
   optarg="${@}"
   if [[ -f "$optarg" ]]; then
     code_string=( $(cat "$optarg") )
@@ -90,20 +90,20 @@ function getOptions() {
 
 function decypher() {
   # Magic happens here
-  decyphered=""
+  message=""
   line_count=1
   for key in ${THE_KEYS[@]}; do
     echo "${THE_BOOK}" | while read str_line; do
       if [[ "$key" == "$line_count" ]]; then
         ((THE_CODE[$key]--))
-        decyphered="${decyphered}${str_line:${THE_CODE[$key]}:1}"
+        message="${message}${str_line:${THE_CODE[$key]}:1}"
       fi
       ((line_count++))
     done
     line_count=1
   done
 
-  echo -e "  MESSAGE:\n${decyphered}"
+  echo -e "\tMESSAGE:\n${message}"
 }
 
 
