@@ -56,7 +56,7 @@ function cypher() {
   declare final_string
 
   for i in $(seq 1 ${#THE_MESSAGE}); do
-    code_lines+=( $(( $RANDOM % $((${book_lines} - 4)) )) )
+    code_lines+=( $(( $RANDOM % $((${book_lines})) )) )
   done
 
   for i in $(seq 1 ${#code_lines}); do
@@ -79,13 +79,18 @@ function cypher() {
                         if(substr($0,i,1)==ltr)
                         print NR " " i
                       }
-                    ' | head -1
+                    ' | tail -1
                   )"
-      if [[ ! -z "$code_bits" ]]; then
+      if [[ ! -z "$code_bits" ]] && [[ "$code_bits" != 0 ]]; then
+        echo "$code_bits $char" >&2
         final_string+="${code_bits} "
         unset code_bits
         break
+      elif [[ ${line} == "${book_lines}" ]]; then
+        echo "$line $char" >&2
+        line=1
       else
+        echo "nothing: $line" >&2
         ((line++))
       fi
     done

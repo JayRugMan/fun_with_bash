@@ -95,11 +95,15 @@ function decypher() {
   for key in ${THE_KEYS[@]}; do
     echo "${THE_BOOK}" | while read str_line; do
       if [[ "$key" == "$line_count" ]]; then
-        ((THE_CODE[$key]--))
-        message="${message}${str_line:${THE_CODE[$key]}:1}"
+        char_num="${THE_CODE[$key]}"
+        echo $char_num >&2
+        #((THE_CODE[$key]--))
+        #JHmessage+="${str_line:${THE_CODE[$key]}:1}"
+        message+="${str_line[${char_num}]}"
       fi
       ((line_count++))
     done
+    echo "${message}" >&2
     line_count=1
   done
 
@@ -109,6 +113,7 @@ function decypher() {
 
 function main() {
   # MAIN FUNCTION
+  echo "DECODE DEBUG" >&2
   declare THE_BOOK
   declare -A THE_CODE
   declare -a THE_KEYS
