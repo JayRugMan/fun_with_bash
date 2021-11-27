@@ -29,30 +29,14 @@ EOF
 }
 
 
-function get_keys() {
-  # gets the keys for an ordered array because order
-  # matters and associative arrays are unordered
-  code_str="${@}"
-  key_count=${#THE_CODE}
-  for i in $(seq 1 ${key_count}); do
-    # appends the first value of the string (the key) to the keys array
-    THE_KEYS+=(${code_str%% *})
-    # removes the first two values (first key/value pair) of the string
-    code_str="${code_str#* }" ; code_str="${code_str#* }"
-  done
-}
-
-
 function get_code() {
   # gets the code from the optarg
   optarg="${@}"
   if [[ -f "$optarg" ]]; then
-    code_string=( $(cat "$optarg") )
+    THE_CODE="$(cat $optarg)"
   else
-    code_string=( $(echo $optarg) )
+    THE_CODE="$optarg"
   fi
-  THE_CODE=( $(echo $code_string) )
-  get_keys "${code_string}"
 }
 
 
@@ -92,18 +76,16 @@ function decypher() {
   # Magic happens here
   message=""
   line_count=1
-  for key in ${THE_KEYS[@]}; do
+  while [[ ! -z "$THE_CODE" ]]; do
     echo "${THE_BOOK}" | while read str_line; do
-      if [[ "$key" == "$line_count" ]]; then
-        char_num="${THE_CODE[$key]}"
-        echo $char_num >&2
-        #((THE_CODE[$key]--))
-        #JHmessage+="${str_line:${THE_CODE[$key]}:1}"
+      coded_line="${THE_CODE%% *}"
+      if [[ "$coded_line" == "$line_count" ]]; then
+        char_num="${${THE_CODE#* }%% *}"
+        THE_CODE="${${THE_CODE#* }#* }"  # removes the first two coded numbers
         message+="${str_line[${char_num}]}"
       fi
       ((line_count++))
     done
-    echo "${message}" >&2
     line_count=1
   done
 
@@ -113,10 +95,8 @@ function decypher() {
 
 function main() {
   # MAIN FUNCTION
-  echo "DECODE DEBUG" >&2
   declare THE_BOOK
-  declare -A THE_CODE
-  declare -a THE_KEYS
+  declare THE_CODE
   getOptions "${@}"
   decypher
 }

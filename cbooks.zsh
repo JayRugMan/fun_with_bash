@@ -82,15 +82,12 @@ function cypher() {
                     ' | tail -1
                   )"
       if [[ ! -z "$code_bits" ]] && [[ "$code_bits" != 0 ]]; then
-        echo "$code_bits $char" >&2
         final_string+="${code_bits} "
         unset code_bits
         break
       elif [[ ${line} == "${book_lines}" ]]; then
-        echo "$line $char" >&2
         line=1
       else
-        echo "nothing: $line" >&2
         ((line++))
       fi
     done
