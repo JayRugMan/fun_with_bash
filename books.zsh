@@ -83,13 +83,14 @@ function decypher() {
         char_num="${${THE_CODE#* }%% *}"
         THE_CODE="${${THE_CODE#* }#* }"  # removes the first two coded numbers
         message+="${str_line[${char_num}]}"
+        break
       fi
       ((line_count++))
     done
     line_count=1
   done
 
-  echo -e "\tMESSAGE:\n${message}"
+  echo -e "\tMESSAGE:\n${message}" | sed 's/+/ /g'
 }
 
 
