@@ -76,12 +76,21 @@ function decypher() {
   # Magic happens here
   message=""
   line_count=1
-  while [[ ! -z "$THE_CODE" ]]; do
+  while [[ ! -z "$THE_CODE" ]]; do  # THE_CODE deminished until it is unset as the loop progresses
     echo "${THE_BOOK}" | while read str_line; do
       coded_line="${THE_CODE%% *}"
       if [[ "$coded_line" == "$line_count" ]]; then
         char_num="${${THE_CODE#* }%% *}"
-        THE_CODE="${${THE_CODE#* }#* }"  # removes the first two coded numbers
+        
+        # the parameter expansion utilized breaks down with only two
+        # "elements", so this if statement changes the logic depending
+        # on the number of "elements" left, thus avoiding an endless loop
+        if [[ $(echo "$THE_CODE" | awk '{print NF}') -gt 2 ]]; then
+          THE_CODE="${${THE_CODE#* }#* }"  # removes the first two coded numbers
+        else
+          unset THE_CODE
+        fi
+        
         message+="${str_line[${char_num}]}"
         break
       fi
