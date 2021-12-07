@@ -64,17 +64,22 @@ function getOptions() {
 function this_seds_it_all() {
   # Filters for known special character charset with sed
   sed "s/+/ /g;
-     s/XSPe/\!/g;
      s/XSPp/./g;
      s/XSPc/,/g;
      s/XSPa/'/g;
      s/XSPq/?/g;
      s/XSPl/+/g;
      s/XSPd/-/g;
-     s/XSPu/=/g;
-     s/XSPs/\//g;
+     s/XSPe/=/g;
      s/XSPo/:/g;
-     s/XSPm/\&/g;" /dev/stdin
+     s/XSP1/\!/g;
+     s/XSP2/@/g;
+     s/XSP3/#/g;
+     s/XSP4/$/g;
+     s/XSP5/%/g;
+     s/XSP6/^/g;
+     s/XSP7/\&/g;
+     s/XSP8/*/g;" /dev/stdin
 }
 
 

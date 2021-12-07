@@ -28,7 +28,7 @@ Usage:
 *                            Prints this helpful output
 
 Special Characters:          Only the following special characters will work:
-                                          ! . , ' ? + - = / : &
+                                     . , ' ? + - = : ! @ # $ % ^ & * /
                              Note: Because of how some of these are interpreted
                              by the shell it would be wise to create a message
                              file and reference that with the -m option
@@ -51,8 +51,6 @@ function get_message() {
 function filter_special_char() {
   # turns special characters into text strings for encoding
   case "${@}" in
-    '!')
-      special_chars="XSPe";;
     '.')
       special_chars="XSPp";;
     ',')
@@ -66,15 +64,27 @@ function filter_special_char() {
     '-')
       special_chars="XSPd";;
     '=')
-      special_chars="XSPu";;
-    '/')
-      special_chars="XSPs";;
+      special_chars="XSPe";;
     ':')
       special_chars="XSPo";;
+    '!')
+      special_chars="XSP1";;
+    '@')
+      special_chars="XSP2";;
+    '#')
+      special_chars="XSP3";;
+    '$')
+      special_chars="XSP4";;
+    '%')
+      special_chars="XSP5";;
+    '^')
+      special_chars="XSP6";;
+    '&')
+      special_chars="XSP7";;
+    '*')
+      special_chars="XSP8";;
     ' ')
       special_chars="+";;
-    '&')
-      special_chars="XSPm";;
     *)
       special_chars="${@}";;
   esac
