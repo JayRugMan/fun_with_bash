@@ -1,10 +1,41 @@
 #!/usr/bin/env zsh
 # Created by Jason Hardman
 # 2021-11-21
-
-## THESE COMMANDS NEED BE BECOME A SCRIPT
+# This script encrypts - takes a message and book file, returns number pairs
 
 ## testMessage="This is a test Message"
+
+
+function usage() {
+  # Prints usage
+  if [ "$@" ] ; then
+    echo "ERROR: ${@}"
+  fi
+  cat <<EOF
+
+Usage:
+
+-b <book> | -                This designates the file or input that
+                             acts as the "book" in the book code.
+                             It can be piped to standard in, which
+                             requires "-b -" or be specified file
+
+-m "string" | file.txt       This designates the message you want encoded as
+                             number pairs. It can either be a quoted string or
+                             a file with a string. See the section below on
+                             special characters.
+
+*                            Prints this helpful output
+
+Special Characters:          Only the following special characters will work:
+                                          ! . , ' ? + - = / : &
+                             Note: Because of how some of these are interpreted
+                             by the shell it would be wise to create a message
+                             file and reference that with the -m option
+
+EOF
+}
+
 
 function get_message() {
   # gets the message from the optarg
@@ -14,6 +45,52 @@ function get_message() {
   else
     THE_MESSAGE="$optarg"
   fi
+}
+
+
+function filter_special_char() {
+  # turns special characters into text strings for encoding
+  case "${@}" in
+    '!')
+      special_chars="XSPe";;
+    '.')
+      special_chars="XSPp";;
+    ',')
+      special_chars="XSPc";;
+    "'")
+      special_chars="XSPa";;
+    '?')
+      special_chars="XSPq";;
+    '+')
+      special_chars="XSPl";;
+    '-')
+      special_chars="XSPd";;
+    '=')
+      special_chars="XSPu";;
+    '/')
+      special_chars="XSPs";;
+    ':')
+      special_chars="XSPo";;
+    ' ')
+      special_chars="+";;
+    '&')
+      special_chars="XSPm";;
+    *)
+      special_chars="${@}";;
+  esac
+  echo "${special_chars}"
+}
+
+
+function swap_specials() {
+  # Changes out special characters in message to comply with base62 available characters
+  new_message=""
+  num_mess_char_offset="$((${#THE_MESSAGE}-1))"
+  for i in $(seq 0 ${num_mess_char_offset}); do
+    new_char="$(filter_special_char "${THE_MESSAGE:${i}:1}")"
+    new_message+="${new_char}"
+  done
+  THE_MESSAGE="${new_message}"
 }
 
 
@@ -27,6 +104,7 @@ function getOptions() {
         ;;
       'm') # message file or string
         get_message "$OPTARG"
+        swap_specials
         has_message=1
         ;;
       'h')
@@ -40,10 +118,10 @@ function getOptions() {
     esac
   done
   if [[ "$has_book" -ne 1 ]]; then
-    usage "No book Provided"
+    usage "I need something to read\!"
     exit 1
   elif [[ "$has_message" -ne 1 ]]; then
-    usage "No message Provided"
+    usage "Silence is compliance\!"
     exit 1
   fi
 }

@@ -12,18 +12,7 @@ function usage() {
 
 Usage:
 
--b <book> | -                This designates the file or input that
-                             acts as the "book" in the book code.
-                             It can be piped to standard in, which
-                             requires "-b -" or be specified file
-
--c "string" | file.txt       This designates the encoded string of
-                             numbers, formatted in pairs where the
-                             first of each pair is the line and the
-                             second it the character. All numbers
-                             should be separated by a space.
-
-*                            Prints this helpful output
+I hope you're good with zsh code so you can pick apart the script for usage ;D
 
 EOF
 }
@@ -63,12 +52,29 @@ function getOptions() {
     esac
   done
   if [[ "$has_book" -ne 1 ]]; then
-    usage "No book Provided"
+    usage "I have nothing to read\!"
     exit 1
   elif [[ "$has_code" -ne 1 ]]; then
-    usage "No code Provided"
+    usage "Silence is compliance\!"
     exit 1
   fi
+}
+
+
+function this_seds_it_all() {
+  # Filters for known special character charset with sed
+  sed "s/+/ /g;
+     s/XSPe/\!/g;
+     s/XSPp/./g;
+     s/XSPc/,/g;
+     s/XSPa/'/g;
+     s/XSPq/?/g;
+     s/XSPl/+/g;
+     s/XSPd/-/g;
+     s/XSPu/=/g;
+     s/XSPs/\//g;
+     s/XSPo/:/g;
+     s/XSPm/\&/g;" /dev/stdin
 }
 
 
@@ -99,7 +105,7 @@ function decypher() {
     line_count=1
   done
 
-  echo -e "\tMESSAGE:\n${message}" | sed 's/+/ /g'
+  echo -e "\tMESSAGE:\n${message}" | this_seds_it_all
 }
 
 
