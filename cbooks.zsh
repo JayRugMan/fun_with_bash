@@ -29,6 +29,7 @@ Usage:
 
 Special Characters:          Only the following special characters will work:
                                      . , ' ? + - = : ! @ # $ % ^ & * /
+
                              Note: Because of how some of these are interpreted
                              by the shell it would be wise to create a message
                              file and reference that with the -m option
@@ -148,16 +149,12 @@ function cypher() {
   done
 
   for i in $(seq 1 ${#code_lines}); do
-    # because messages likely have spaces and
-    # base64 does not, I turn them into "+"
-    if [[ "${THE_MESSAGE[$i]}" == " " ]]; then
-      char='+'
-    else
-      char="${THE_MESSAGE[$i]}"
-    fi
+    char="${THE_MESSAGE[$i]}"
+    
     # this gets the line number, which will incement if
     # the specified character isn't found on that line
     line="${code_lines[$i]}"
+    
     # while loop exits if character is found on
     # the specifed line, or the line increments
     while true; do
