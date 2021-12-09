@@ -32,6 +32,6 @@ else
 
   # Clean up boot directory of older kernel files
   for ver in ${allButLastTwoKernVers}; do
-    echo "rm -f /boot/*${ver}*" | sh
+    echo "rm -vf /boot/*${ver}*" | sh
   done
 fi
