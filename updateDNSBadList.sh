@@ -9,10 +9,11 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 COMPILE_DIR="/root/Documents/dns"
 NAUGHTY_LIST_FILE="/etc/badList_hosts"
+BLACKLIST="blacklist.txt"
 # -- Make sure the index of each remote hosts file lines up with each local hosts file, 
 # and that there are the same or more items in the Local Hosts File
 REMOTE_HOSTS_FILES=(https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/gambling-porn-social/hosts https://www.github.developerdan.com/hosts/lists/ads-and-tracking-extended.txt)
-LOCAL_HOSTS_FILES=(gamPorSo_hosts ads-and-tracking-extended.txt badList_hosts.bak blacklist.txt)
+LOCAL_HOSTS_FILES=(gamPorSo_hosts ads-and-tracking-extended.txt badList_hosts.bak ${BLACKLIST})
 COMPILATION_FILE="HostsBlockCompilation"
 WHITELIST_FIXED="$COMPILE_DIR/dnsWhite_fixed.lst"
 WHITELIST_REGEX="$COMPILE_DIR/dnsWhite_regex.lst"
