@@ -30,11 +30,11 @@ function calc_archv_count() {
   # This takes the number of files and tar size limit
   # to determine the number of final tar files
 
-  tar_size_limit=26843545600  # 25G
+  tar_size_limit=21474836480  # 20G
   t_cap=$1
   tar_file_count=$((t_cap / tar_size_limit))
 
-  # if the capacity does divide evenly by 25G and there is
+  # if the capacity doesn't divide evenly by 2G and there is
   # more than 5G left, it adds another tar file to the count
   if [[ $((t_cap % tar_size_limit)) -gt 5368709120 ]]; then
     ((tar_file_count++))
@@ -50,8 +50,8 @@ unset IFS
 file_sizes=(${the_files[@]%% *})
 file_names=("${the_files[@]#* }")
 file_count=${#the_files[@]}
-
 half_file_count=$((file_count/2))
+
 total_cap=$(calc_tot_capacity ${file_sizes[@]})
 is_odd=$([[ $((file_count%2)) -eq 1 ]] && echo "true" || echo "false")
 arch_file_count=$(calc_archv_count $total_cap)
