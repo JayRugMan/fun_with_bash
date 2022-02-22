@@ -1,0 +1,47 @@
+unset arch_list && declare -A arch_lists=()
+for arch_num in $(seq 1 "$arch_file_count"); do
+  arch_lists[$arch_num]=0;
+done
+twice_afc=$((arch_file_count * 2))
+high_card=$((file_count - 1))
+low_card=0
+direction="right"
+while [[ "$low_card" -lt "$half_file_count" ]]; do
+  hi_lo_diff=$((high_card - low_card))
+  if [[ "${hi_lo_diff}" -lt "$twice_afc" ]]; then
+    break
+  fi
+  case "$direction" in
+    "right")
+      for hand in $(seq 1 "$arch_file_count"); do
+        arch_list[$hand]=$((arch_list[$hand] + file_sizes[$high_card] + file_sizes[$low_card]))
+        ##JH echo -e "${file_names[$high_card]}\n${file_names[$low_card]}" >> ~/included_files.lst
+        ((high_card--))
+        ((low_card++))
+      done
+      direction="left"
+      ;;
+    "left")
+      for hand in $(seq "$arch_file_count" -1 1); do
+        arch_list[$hand]=$((arch_list[$hand] + file_sizes[$high_card] + file_sizes[$low_card]))
+        ##JH echo -e "${file_names[$high_card]}\n${file_names[$low_card]}" >> ~/included_files.lst
+        ((high_card--))
+        ((low_card++))
+      done
+      direction="right"
+      ;;
+  esac
+done
+last_hand=$((arch_file_count + 1))
+for remainders in $(seq 0 "$hi_lo_diff"); do
+  if [[ -z "${arch_list[$last_hand]}" ]]; then
+    arch_list[$last_hand]=${file_sizes[$low_card]}
+  else
+    arch_list[$last_hand]=$((arch_list[$last_hand] + file_sizes[$low_card]))
+  fi
+  ((low_card++))
+done
+unset direction hi_lo_diff hand remainders arch_num last_hand
+for i in ${arch_list[@]}; do echo $i | awk '{print $0/(1024^3)}'; done
+calc_tot_capacity ${arch_list[@]}
+echo $total_cap

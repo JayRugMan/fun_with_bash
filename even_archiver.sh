@@ -22,7 +22,7 @@ function calc_tot_capacity(){
   for i in ${capacities[@]}; do
     total=$((total + i))
   done
-  echo $total && unset total
+  echo $total && unset total capacities
 }
 
 
@@ -31,18 +31,21 @@ function calc_archv_count() {
   # to determine the number of final tar files
 
   tar_size_limit=21474836480  # 20G
+  ##JH tar_size_limit=10737418240  # 10G
   t_cap=$1
   tar_file_count=$((t_cap / tar_size_limit))
 
-  # if the capacity doesn't divide evenly by 2G and there is
-  # more than 5G left, it adds another tar file to the count
-  if [[ $((t_cap % tar_size_limit)) -gt 5368709120 ]]; then
-    ((tar_file_count++))
-  fi
+  # if the capacity doesn't divide evenly by 10G and there
+  # is more than 3G left, or if the total capacityu is less
+  # than 10G, it adds another tar file to the count
+  ##JH if [[ $((t_cap % tar_size_limit)) -gt 3221225472 ]] || [[ "$tar_file_count" -eq 0 ]]; then
+  ##JH   ((tar_file_count++))
+  ##JH fi
   echo $tar_file_count
 }
 
 
+## SET ARGS ##
 IFS=$'\n'
   the_files=($(find . -type f -exec du -sb {} \;| sort -n| sed 's/\t/ /g'))
 unset IFS
@@ -56,15 +59,56 @@ total_cap=$(calc_tot_capacity ${file_sizes[@]})
 is_odd=$([[ $((file_count%2)) -eq 1 ]] && echo "true" || echo "false")
 arch_file_count=$(calc_archv_count $total_cap)
 
-declare -a totals
-t_idx=0                # will increase with each itteration of "while" loop
-ht_factor=1            # will increase with each itteration of "while" loop
+declare -A arch_lists=()
 
-while [[ "$t_idx" -lt "$half_file_count" ]]; do
-  theA=$(echo "$the_files"| head -${ht_factor}| tail -1)
-  theB=$(echo "$the_files"| tail -${ht_factor}| head -1)
-  totals[$t_idx]=$(echo "$theA + $theB"| bc)
-  ((tidx++)); ((ht_factor++)); unset theA theB
+for arch_num in $(seq 1 "$arch_file_count"); do
+  arch_lists[$arch_num]=0;
+done
+twice_afc=$((arch_file_count * 2))
+high_card=$((file_count - 1))
+low_card=0
+direction="right"
+##
+
+while [[ "$low_card" -lt "$half_file_count" ]]; do
+
+  hi_lo_diff=$((high_card - low_card))
+  if [[ "${hi_lo_diff}" -lt "$twice_afc" ]]; then
+    break
+  fi
+
+  case "$direction" in
+    "right")
+      for hand in $(seq 1 "$arch_file_count"); do
+        arch_list[$hand]+="\"${file_names[$high_card]}\" \"${file_names[$low_card]}\" "
+        ((high_card--))
+        ((low_card++))
+      done
+      direction="left"
+      ;;
+    "left")
+      for hand in $(seq "$arch_file_count" -1 1); do
+        arch_list[$hand]+="\"${file_names[$high_card]}\" \"${file_names[$low_card]}\" "
+        ((high_card--))
+        ((low_card++))
+      done
+      direction="right"
+      ;;
+  esac
+
 done
 
-unset tidx the_beg the_end the_files
+last_hand=$((arch_file_count + 1))
+for remainders in $(seq 0 "$hi_lo_diff"); do
+  if [[ -z "${arch_list[$last_hand]}" ]]; then
+    arch_list[$last_hand]="\"${file_names[$low_card]}\" "
+  else
+    arch_list[$last_hand]+="\"${file_names[$low_card]}\" "
+  fi
+  ((low_card++))
+done
+
+for i in ${!arch_list[@]}; do
+  echo "tar cvzf /mnt/backups/media_backups_plex01_$(date +%Y%m%d_%H%M)_init_Movies-${i}.tgz ${arch_list[$i]}" | sh
+  echo -e "\n"
+done
