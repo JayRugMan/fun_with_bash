@@ -15,7 +15,15 @@
 #    size and number of files.
 
 
-function calc_tot_capacity(){
+function get_files() {
+  # Uses crafted find command to get all of the files
+  IFS=$'\n'
+  THE_FILES=( $(find . -type f -exec du -sb {} \;| sort -n| sed 's/\t/ /g') )
+  unset IFS
+}
+
+
+function calc_tot_capacity() {
   # Calculates the total, uncompressed capacity of the files to be archived
   capacities=(${@})
   total=0
@@ -42,73 +50,88 @@ function calc_archv_count() {
   ##JH   ((tar_file_count++))
   ##JH fi
   echo $tar_file_count
+  unset tar_size_limit t_cap tar_file_count
 }
 
 
-## SET ARGS ##
-IFS=$'\n'
-  the_files=($(find . -type f -exec du -sb {} \;| sort -n| sed 's/\t/ /g'))
-unset IFS
+function deal_me_in() {
+  # "deals card," or distributes file names to archive lists per deal order
+  h_card="${1}"; shift
+  l_card="${1}"; shift
+  for hand in ${@}; do
+    ARCH_LISTS[$hand]+="\"${FILE_NAMES[$h_card]}\" \"${FILE_NAMES[$l_card]}\" "
+  done
+  unset h_card t_card
+}
 
-file_sizes=(${the_files[@]%% *})
-file_names=("${the_files[@]#* }")
-file_count=${#the_files[@]}
-half_file_count=$((file_count/2))
 
-total_cap=$(calc_tot_capacity ${file_sizes[@]})
-is_odd=$([[ $((file_count%2)) -eq 1 ]] && echo "true" || echo "false")
-arch_file_count=$(calc_archv_count $total_cap)
+function build_lists() {
+  # builds lists for tar commands
 
-declare -A arch_lists=()
+  file_count=${#THE_FILES[@]}
+  half_file_count=$((file_count/2))
+  high_card=$((file_count - 1))
+  low_card=0
+  total_cap=$(calc_tot_capacity ${FILE_SIZES[@]})
+  arch_file_count=$(calc_archv_count $total_cap)
+  twice_afc=$((arch_file_count * 2))
+  direction="right"
 
-for arch_num in $(seq 1 "$arch_file_count"); do
-  arch_lists[$arch_num]=0;
-done
-twice_afc=$((arch_file_count * 2))
-high_card=$((file_count - 1))
-low_card=0
-direction="right"
-##
+  while [[ "$low_card" -lt "$half_file_count" ]]; do
 
-while [[ "$low_card" -lt "$half_file_count" ]]; do
+    hi_lo_diff=$((high_card - low_card))
+    if [[ "${hi_lo_diff}" -lt "$twice_afc" ]]; then
+      break
+    fi
 
-  hi_lo_diff=$((high_card - low_card))
-  if [[ "${hi_lo_diff}" -lt "$twice_afc" ]]; then
-    break
-  fi
+    case "$direction" in
+      "right")
+        deal_order=($(seq 1 "$arch_file_count"))
+        deal_me_in "$high_card" "$low_card" ${deal_order[@]}
+        direction="left"
+        ;;
+      "left")
+        deal_order=($(seq "$arch_file_count" -1 1))
+        deal_me_in "$high_card" "$low_card" ${deal_order[@]}
+        direction="right"
+        ;;
+    esac
 
-  case "$direction" in
-    "right")
-      for hand in $(seq 1 "$arch_file_count"); do
-        arch_list[$hand]+="\"${file_names[$high_card]}\" \"${file_names[$low_card]}\" "
-        ((high_card--))
-        ((low_card++))
-      done
-      direction="left"
-      ;;
-    "left")
-      for hand in $(seq "$arch_file_count" -1 1); do
-        arch_list[$hand]+="\"${file_names[$high_card]}\" \"${file_names[$low_card]}\" "
-        ((high_card--))
-        ((low_card++))
-      done
-      direction="right"
-      ;;
-  esac
+    high_card=$((high_card - arch_file_count))
+    low_card=$((low_card + arch_file_count))
 
-done
+  done
 
-last_hand=$((arch_file_count + 1))
-for remainders in $(seq 0 "$hi_lo_diff"); do
-  if [[ -z "${arch_list[$last_hand]}" ]]; then
-    arch_list[$last_hand]="\"${file_names[$low_card]}\" "
-  else
-    arch_list[$last_hand]+="\"${file_names[$low_card]}\" "
-  fi
-  ((low_card++))
-done
+  last_hand=$((arch_file_count + 1))
+  for remainders in $(seq 0 "$hi_lo_diff"); do
+    if [[ -z "${ARCH_LISTS[$last_hand]}" ]]; then
+      ARCH_LISTS[$last_hand]="\"${FILE_NAMES[$low_card]}\" "
+    else
+      ARCH_LISTS[$last_hand]+="\"${FILE_NAMES[$low_card]}\" "
+    fi
+    ((low_card++))
+  done
+}
 
-for i in ${!arch_list[@]}; do
-  echo "tar cvzf /mnt/backups/media_backups_plex01_$(date +%Y%m%d_%H%M)_init_Movies-${i}.tgz ${arch_list[$i]}" | sh
-  echo -e "\n"
-done
+
+function and_now_archive() {
+  # Archives
+  for i in ${!ARCH_LISTS[@]}; do
+    echo "tar cvzf /mnt/backups/media_backups_plex01_$(date +%Y%m%d_%H%M)_init_Movies-${i}.tgz ${ARCH_LISTS[$i]}" | sh
+    echo -e "\n"
+  done
+}
+
+
+function main() {
+  ## SET ARGS ##
+  declare -a THE_FILES; get_files
+  declare -A ARCH_LISTS
+  FILE_SIZES=(${THE_FILES[@]%% *})
+  FILE_NAMES=("${THE_FILES[@]#* }")
+  ####
+  build_lists
+  and_now_archive
+}
+
+main
