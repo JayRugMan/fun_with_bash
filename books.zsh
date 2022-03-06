@@ -79,7 +79,7 @@ function this_seds_it_all() {
      s/XSP5/%/g;
      s/XSP6/^/g;
      s/XSP7/\&/g;
-     s/XSP8/*/g;" /dev/stdin
+     s/XSP8/*/g;"
 }
 
 
