@@ -2,58 +2,71 @@
 # This script depends on tcpdump and iproute
 # Captures tcp packets on a desgnated interface
 
+
 function usage() {
+  local array="$1[@]"
   cat <<EOF
 
 Usage:
 
--h                      prints usage (this)
--i <interface>          designates interface (eth0 or br0)
+-i <interface>          designates interface (${!array})
+*                       prints usage (this)
 
 Note:
 - if no args are provided, dialogue will ask for interface
-- the command run is 
+- the command run is
 #    tcpdump -i <chosen Interface> -nn -s0 -vv -w tcpdump_<interface>_\$(date +%Y%m%d-%H%M%S).pcap
-
 
 EOF
 }
 
-option=${1}
 
-# set up an array of interfaces
-interfaceList=($(ip link show | awk '/^[1-9]/ {print substr($2, 1, length($2)-1)}'))
-declare -A ifacesarray
-for name in ${interfaceList[@]}; do 
-  ifacesarray["$name"]=1
-done
+function is_in() {
+  local array="$1[@]"
+  local seeking="$2"
+  local in=1
+  for element in "${!array}"; do
+    if [[ "$element" == "$seeking" ]]; then
+      in=0
+      break
+    fi
+  done
+  return $in
+}
 
-if [[ -z $option ]]; then
+
+if [[ -z "${1}" ]]; then
   option="int"
+else
+  option="${1}"
 fi
 
-case $option in
-  -h )
-    usage
-    exit 0
-    ;;
+# set up an array of interfaces
+ifaces=($(ip link show | awk '/^[1-9]/ {print substr($2, 1, length($2)-1)}'))
+
+case "$option" in
   -i )
-    if [[ -z ${2} ]] || [[ ! ${ifacesarray["$2"]} ]] ; then
-      usage
-    else
+    if [[ -v ${2} ]] && (is_in ifaces "${2}") ; then
       iface=${2}
+    else
+      usage ifaces
+      exit 1
     fi
     ;;
   int )
     while true; do
-      echo -n "for usage, run with -h - Which interface?(${interfaceList[@]}) "
+      echo -n "for usage, run with -h - Which interface?(${ifaces[@]}) "
       read -e iface
-      if [[ ${ifacesarray["$iface"]} ]]; then
+      if (is_in ifaces "$iface") ; then
         break
       else
         echo "invalid interface"
       fi
     done
+    ;;
+  * )
+    usage ifaces
+    exit 0
     ;;
 esac
 
