@@ -31,21 +31,21 @@ usage $arg_count $expected_args
 
 expect << EOF
   spawn sftp -oIdentityFile=${ssh_key} -P ${ssh_port} ${ssh_user}@${ssh_host}:${remote_dir}
-  set timeout 2
+  set timeout 5
   expect "Enter passphrase" {send "${pp}\r"}
-##JH  send "${pp}\r"
   expect {
     "Permission denied" {send_user "invalid password or account\n"; exit 1}
     "Connection refused" {send_user "Connection to ${ssh_user}@${ssh_host} via port ${ssh_port} failed\n"; exit 1}
-    "Connected" {exp_continue}
-    "Changing" {exp_continue}
+    -re "Connected|Changing" {exp_continue}
   }
   expect "sftp"
   send "put test*.txt\rquit\r"
   expect {
     "No such file or directory" {send "quit\r"; send_user "the file was not found.\n"; exit 1}
+    timeout {send_user "Timed out sending file\r"; exit 1}
     eof {exit}
   }
+  expect timeout {send_user "Connection attempt timed out\n"; exit 1}
 EOF
 exp_exit_code=$?
 
