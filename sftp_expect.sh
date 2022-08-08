@@ -1,4 +1,3 @@
-cat my_expect.sh
 #!/bin/bash
 
 arg_count=$#
@@ -13,6 +12,7 @@ case $ssh_key in
   "/home/jason/.ssh/id_rsa" ) 
     expected_args=5
     source "${ssh_ppf}"
+    ##JH pp="1234wrongpw"
     ;;
   "/home/jason/.ssh/id_rsa_2" ) expected_args=4;;
 esac
@@ -36,14 +36,17 @@ expect << EOF
 ##JH  expect eof
   expect {
     "Enter passphrase" {send "${pp}\r"; exp_continue}
-    "Permission denied" {send_user "invalid password or account\n"; exit}
-    "Connection refused" {send_user "Connection to ${ssh_user}@${ssh_host} via port ${ssh_port} failed\n"; exit}
-    timeout {send_user "connection to ${ssh_host} timed out\n"; exit}
+    "Permission denied" {catch wait result; send_user "invalid password or account\n"; exit [lindex \$result 3]}
+    "Connection refused" {catch wait result; send_user "Connection to ${ssh_user}@${ssh_host} via port ${ssh_port} failed\n"; exit [lindex \$result 3]}
+    timeout {catch wait result; send_user "connection to ${ssh_host} timed out\n"; exit [lindex \$result 3]}
     "sftp>" {send "put test*.txt\rquit\r"; exp_continue}
-    eof {exit}
+    eof {catch wait result; exit [lindex \$result 3]}
   }
 ##JH    timeout {send_user "connection to ${ssh_host} timed out\n"; exit}
 ##JH    eof {exit}
 EOF
+exp_exit_code=$?
 
 echo -e "\ndone with this crap"
+exit ${exp_exit_code}
+
