@@ -28,6 +28,8 @@ function get_pic_info() {
   for the_file in $(ls | grep -i "${grep_search_filter}"); do
     file_type="${the_file##*.}"
 
+    echo -ne "${the_file}: Working..."
+
     if [[ "${pic_ext_array_jpg[@]}" =~ ${file_type:l} ]]; then
       the_y="$(exif -t DateTimeOriginal --machine-readable "$the_file" 2>/dev/null |
                awk -F':' '{print $1}'
@@ -55,6 +57,9 @@ function get_pic_info() {
 
     PICTURES[$the_file]="$the_y"
     unset the_y
+
+    echo -e "/b/b/b/b/b/b/b/b/bComplete   "
+
   done
   unset IFS
 }
@@ -92,10 +97,10 @@ function main() {
   # The main even
   typeset -A PICTURES
   typeset -a YEARS
-  get_pic_info
-  get_year_list
-  make_dir
-  move_them_pics
+  echo "Getting picture info"; get_pic_info
+  echo "Getting list of years";  get_year_list
+  echo "Making directories if needed"; make_dir
+  echo "Moving Pictures"; move_them_pics
 }
 
 
