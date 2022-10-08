@@ -28,7 +28,7 @@ function get_pic_info() {
   for the_file in $(ls | grep -i "${grep_search_filter}"); do
     file_type="${the_file##*.}"
 
-    echo -ne "${the_file}: Working..."
+    echo -ne "- Gathering info for ${the_file}: Working..."
 
     if [[ "${pic_ext_array_jpg[@]}" =~ ${file_type:l} ]]; then
       the_y="$(exif -t DateTimeOriginal --machine-readable "$the_file" 2>/dev/null |
@@ -58,7 +58,7 @@ function get_pic_info() {
     PICTURES[$the_file]="$the_y"
     unset the_y
 
-    echo -e "/b/b/b/b/b/b/b/b/bComplete   "
+    echo -e "\b\b\b\b\b\b\b\b\b\bComplete   "
 
   done
   unset IFS
@@ -88,6 +88,7 @@ function make_dir() {
 function move_them_pics() {
   # Pictures are moved to the corresponding year directory
   for the_picture the_year in ${(@kv)PICTURES}; do
+    echo "  Moving ${the_picture} to ${the_year}:"
     echo "mv -v \"$the_picture\" \"$the_year\"" | /usr/bin/zsh
   done
 }
@@ -104,4 +105,4 @@ function main() {
 }
 
 
-main
+main 
