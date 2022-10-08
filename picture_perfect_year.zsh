@@ -2,7 +2,7 @@
 # Created by Jason Hardman 2021-11-03
 # Please note this is a zsh script, not my usualy bash, so
 # - arrays work differently
-# - splitting a command into to or more lines does not require a backslash if piped
+# - splitting a command into two or more lines does not require a backslash if piped
 # - I can iterate over a referenced array's key and value in a single, simple for-loop
 
 
