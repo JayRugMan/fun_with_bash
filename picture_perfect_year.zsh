@@ -88,7 +88,7 @@ function make_dir() {
 function move_them_pics() {
   # Pictures are moved to the corresponding year directory
   for the_picture the_year in ${(@kv)PICTURES}; do
-    echo "  Moving ${the_picture} to ${the_year}:"
+    echo "- Moving ${the_picture} to ${the_year}:"
     echo "mv -v \"$the_picture\" \"$the_year\"" | /usr/bin/zsh
   done
 }
