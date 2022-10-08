@@ -39,10 +39,20 @@ function get_pic_info() {
       fi
     fi
 
+    # Assumes the earlier of the two dates is the most acurate
     if [[ "${pic_ext_array_other[@]}" =~ ${file_type:l} ]] || ${no_exif} ; then
-      the_y="$(identify -verbose "$the_file" 2>/dev/null |
+      the_y_a="$(identify -verbose "$the_file" 2>/dev/null |
                awk -F'( |-){1,}' '/date:create:/ {print $3}'
-              )"
+              )"  # Gets "creation" year
+      the_y_b="$(identify -verbose "$the_file" 2>/dev/null |
+               awk -F'( |-){1,}' '/date:modify:/ {print $3}'
+              )"  # Gets "modification" year
+      if [[ ${the_y_a} -lt ${the_y_b} ]]; then
+        the_y=${the_y_a}
+      elif [[ the_y_b -lt ${the_y_a} ]]; then
+        the_y=${the_y_b}
+      fi
+      unset the_y_a the_y_b 
     fi
 
     if [[ "${vid_ext_array[@]}" =~ "${file_type:l}" ]]; then
