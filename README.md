@@ -12,6 +12,7 @@ cvlc v4l2:///dev/video0
 
 ### opening local webcam with mplayer
 ```bash
+sudo apt update && sudo apt install mplayer
 mplayer tv://device=/dev/video0
 ```
 
