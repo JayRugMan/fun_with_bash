@@ -27,7 +27,7 @@ see my post [here](https://unix.stackexchange.com/a/724658/260866)
 
 ### streaming remote webcam to mplayer
 
-see (confetti)[https://unix.stackexchange.com/users/296862/confetti]'s post (here)[https://unix.stackexchange.com/a/483328/260866]
+see [confetti](https://unix.stackexchange.com/users/296862/confetti)'s post [here](https://unix.stackexchange.com/a/483328/260866)
 
 ```bash
 [me@myComp /some/dir]$ sudo apt update && sudo apt install mplayer
