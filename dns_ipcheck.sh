@@ -4,7 +4,7 @@
 function get_ip() {
   # Gets the ip address for the given host
   local tests=( ${@} )
-  local network="192.168.0"
+  local network="192.168.0"  # EDIT with network portion of the IP address
   local change=false
 
   for i in ${tests[@]}; do
