@@ -72,7 +72,7 @@ function luks_open() {
 
 function luks_close() {
 
-  rsync -Aavp ${MNT_BASE}-${DEVICES[0]}/* ${MNT_BASE}-${DEVICES[1]}/
+  rsync -avP ${MNT_BASE}-${DEVICES[0]}/ ${MNT_BASE}-${DEVICES[1]}/ --delete
   sync
   
   for device in ${DEVICES[@]} ; do
