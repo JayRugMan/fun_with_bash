@@ -3,7 +3,7 @@
 
 function get_device() {
 
-  serial="${1}"
+  local serial="${1}"
   
   local drive="$(lshw -quiet -class disk | awk -v my_serial="$serial" '
     $0~/logical name/ {
@@ -20,23 +20,21 @@ function get_device() {
 
 function map_to_devices(){
 
-  serials=( ${@} )
+  local serials=( ${@} )
 
   echo -ne "Serial nums to devices: mapping..."
   
   for i in ${!serials[@]}; do
-    device_full_path="$(get_device "${serials[$i]}")"
+    local device_full_path="$(get_device "${serials[$i]}")"
     if [[ -z "$device_full_path" ]]; then
       echo -e "\b\b\b\b\b\b\b\b\b\bfailed     "
       usage "One or more of the needed drive is not found"
       exit 1
     fi
     DEVICES[$i]=${device_full_path##*/}
-  done
+  done; unset i
 
   echo -e "\b\b\b\b\b\b\b\b\b\bmapped     "
-
-  unset device_full_path
 }
 
 
@@ -46,7 +44,7 @@ function luks_open() {
   
   for device in ${DEVICES[@]} ; do
     
-    mnt_pnt=${MNT_BASE}-${device}
+    local mnt_pnt=${MNT_BASE}-${device}
 
     if [[ ! -d "${mnt_pnt}" ]]; then
       mkdir ${mnt_pnt} && \
@@ -56,8 +54,9 @@ function luks_open() {
     echo -n "${the_pw}" | cryptsetup luksOpen /dev/${device}1 jrnl-${device} -d - && \
     mount /dev/mapper/jrnl-${device} ${mnt_pnt} && \
     chown -R ${USER}: ${mnt_pnt}
+    unset the_pw device
 
-    exit_code=$?
+    local exit_code=$?
     if [[ $exit_code -ne 0 ]]; then
       usage "Passphrase incorrect"
       exit $exit_code
@@ -66,7 +65,6 @@ function luks_open() {
   done
   
   END_MESSAGE="edit ${DEVICES[0]}, which will copy to ${DEVICES[1]}"
-  unset the_pw device mnt_pnt
 }
 
 
@@ -79,9 +77,8 @@ function luks_close() {
     umount ${MNT_BASE}-${device} && \
     cryptsetup luksClose jrnl-${device} && \
     eject /dev/${device}
-  done
+  done; unset device
   
-  unset device
   END_MESSAGE="Both drives are ready to be removed."
 }
 
@@ -109,12 +106,12 @@ exit 1
 
 function main() {
 
-  option="${1}"
+  local option="${1}"
 
   # Serial numbers of the two thumbdrives. Update accordingly, using the following command:
   #     lshw -quiet -class disk
-  serial_a="4C530000150509111301"
-  serial_b="4C530000060509111233"
+  local serial_a="4C530000150509111301"
+  local serial_b="4C530000060509111233"
 
   declare -a DEVICES
   END_MESSAGE=""
