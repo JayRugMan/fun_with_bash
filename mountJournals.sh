@@ -54,7 +54,6 @@ function luks_open() {
     echo -n "${the_pw}" | cryptsetup luksOpen /dev/${device}1 jrnl-${device} -d - && \
     mount /dev/mapper/jrnl-${device} ${mnt_pnt} && \
     chown -R ${USER}: ${mnt_pnt}
-    unset the_pw device
 
     local exit_code=$?
     if [[ $exit_code -ne 0 ]]; then
@@ -62,7 +61,7 @@ function luks_open() {
       exit $exit_code
     fi
 
-  done
+  done; unset the_pw device
   
   END_MESSAGE="edit ${DEVICES[0]}, which will copy to ${DEVICES[1]}"
 }
