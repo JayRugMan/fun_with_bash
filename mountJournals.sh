@@ -69,6 +69,7 @@ function luks_open() {
 
 function luks_close() {
 
+  echo "Any added or changed objects on ${DEVICES[0]} are being copied to ${DEVICES[1]}"
   rsync -avP ${MNT_BASE}-${DEVICES[0]}/ ${MNT_BASE}-${DEVICES[1]}/ --delete
   sync
   
