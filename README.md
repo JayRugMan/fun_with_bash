@@ -1,22 +1,22 @@
 # fun with bash
 This is a repository of random bash scripts, in addition to these lovely commands.
 
-## Webcam stuff
+## Webcam Stuff
 
-### opening local webcam with VLC:
+### Opening Local Webcam With VLC:
 
 ```bash
 sudo apt update && sudo apt install vlc
 cvlc v4l2:///dev/video0
 ```
 
-### opening local webcam with mplayer
+### Opening Local Webcam With Mplayer
 ```bash
 sudo apt update && sudo apt install mplayer
 mplayer tv://device=/dev/video0
 ```
 
-### streaming remote webcam in terminal as ascii video
+### Streaming Remote Webcam in Terminal as ascii Video
 
 see my post [here](https://unix.stackexchange.com/a/724658/260866)
 
@@ -26,7 +26,7 @@ see my post [here](https://unix.stackexchange.com/a/724658/260866)
 [someone@remoteComp /some/dir]$ cvlc v4l2:///dev/video0
 ```
 
-### streaming remote webcam to mplayer
+### Streaming Remote Webcam to mplayer
 
 __Just the live stream__
 
