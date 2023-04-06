@@ -3,14 +3,14 @@ This is a repository of random bash scripts, in addition to these lovely command
 
 ## Webcam Stuff
 
-### Opening Local Webcam With VLC:
+### Opening Local Webcam with VLC:
 
 ```bash
 sudo apt update && sudo apt install vlc
 cvlc v4l2:///dev/video0
 ```
 
-### Opening Local Webcam With Mplayer
+### Opening Local Webcam with Mplayer
 ```bash
 sudo apt update && sudo apt install mplayer
 mplayer tv://device=/dev/video0
