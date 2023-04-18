@@ -16,17 +16,17 @@ function get_pic_info() {
   IFS=$'\n'
 
   ## Add file-types below
-  pic_ext_array_jpg=( jpg jpeg )
-  pic_ext_array_other=( png gif bmp )
-  vid_ext_array=( mp3 mp4 wav mov mpg flv avi )
+  local pic_ext_array_jpg=( jpg jpeg )
+  local pic_ext_array_other=( png gif bmp )
+  local vid_ext_array=( mp3 mp4 wav mov mpg flv avi )
   ##
 
   # String made from arrays for grep search
-  grep_search_filter="$(echo "${pic_ext_array_jpg[@]} ${pic_ext_array_other[@]} ${vid_ext_array[@]}" | sed 's/ /\\|/g')"
-  no_exif=false
-
+  local grep_search_filter="$(echo "${pic_ext_array_jpg[@]} ${pic_ext_array_other[@]} ${vid_ext_array[@]}" | sed 's/ /\\|/g')"
+  
   for the_file in $(ls | grep -i "${grep_search_filter}"); do
-    file_type="${the_file##*.}"
+    local file_type="${the_file##*.}"
+    local no_exif=false
 
     echo -ne "- Gathering info for ${the_file}: Working..."
 
@@ -49,7 +49,7 @@ function get_pic_info() {
               )"  # Gets "modification" year
       if [[ ${the_y_a} -lt ${the_y_b} ]]; then
         the_y=${the_y_a}
-      elif [[ the_y_b -lt ${the_y_a} ]]; then
+      elif [[ ${the_y_b} -lt ${the_y_a} ]]; then
         the_y=${the_y_b}
       fi
       unset the_y_a the_y_b 
@@ -109,7 +109,7 @@ function main() {
   typeset -A PICTURES
   typeset -a YEARS
   echo "Getting picture info"; get_pic_info
-  echo "Getting list of years";  get_year_list
+  echo "Getting list of years"; get_year_list
   echo "Making directories if needed"; make_dir
   echo "Moving Pictures"; move_them_pics
 }
