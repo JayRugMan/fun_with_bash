@@ -27,6 +27,11 @@ USAGE: ${0##*/} [-i | -u <user> -s <target server> [-d <target directory>] -f <t
 
  *                      Anything else gets you this lovely usage output.
 
+
+NOTE:
+
+The DOMAIN can be left off, hard-coded (check parameter in the main function), or added when prompted
+
 EOF
 
   exit 1
@@ -72,14 +77,14 @@ function upload_file() {
 
   if ! ${Force}; then  # If the -F is used, then no verification is done
     local User_Input=""  # is used in show_prompt function
-    echo -e "\nUploading ${THE_FILE} to ${THE_SERVER}.${THE_DOMAIN}${TARGET_DIR} as ${THE_USER}?"
+    echo -e "\nUploading ${THE_FILE} to ${THE_SERVER}${THE_DOMAIN}${TARGET_DIR} as ${THE_USER}?"
     show_prompt -d 'n' "Confirm to continue ('y')"
   else
     local User_Input="y"
   fi
 
   if [[ "${User_Input}" == "y" ]]; then
-    rsync -avP "${THE_FILE}" ${THE_USER}@${THE_SERVER}.${THE_DOMAIN}${TARGET_DIR}
+    rsync -avP "${THE_FILE}" ${THE_USER}@${THE_SERVER}${THE_DOMAIN}${TARGET_DIR}
     echo -e "\n$(get_hash "${THE_FILE}")\n"  # buffer hash-in-sha command with newlines
   else
     echo ""
@@ -109,6 +114,10 @@ function interactive_mode() {
     THE_FILE="${User_Input}"; User_Input=""
   fi
 
+  if [[ ! -f "${THE_FILE}" ]]; then
+    usage "I can't find file: ${THE_FILE}. Are you in the right directory?"
+  fi
+
   upload_file
 }
 
@@ -116,7 +125,13 @@ function interactive_mode() {
 function opt_2_actions() {
   # Parses options and does the needful per the options
 
-  local Force=false  # defaults to 'false'
+  # defaults to 'false'
+  ##JH local int_mode=false
+  ##JH local has_user=false
+  ##JH local has_server=false
+  ##JH local has_t_dir=false
+  ##JH local has_file=false
+  local Force=false
   local OPTIND OPTION i u s d f F
   while getopts "iu:s:d:f:F" OPTION; do
     case "$OPTION" in
@@ -148,22 +163,45 @@ function opt_2_actions() {
     esac
   done
 
-  if ${int_mode} ; then
+  ##JH if ${int_mode} ; then
     interactive_mode
 
-  else
+  ##JH else
+  ##JH 
+  ##JH   if ! ${has_user} ; then
+  ##JH     THE_USER="$(whoami)"
+  ##JH   fi
+  ##JH 
+  ##JH   if ! ${has_server} ; then
+  ##JH     usage "Where are we sending the file? Please specify a target server hostname."
+  ##JH   elif ! ${has_file} ; then
+  ##JH     usage "What are we uploading? Please specifie a file to upload."
+  ##JH   elif [[ ! -f "${THE_FILE}" ]]; then
+  ##JH     usage "I can't find file: ${THE_FILE}. Are you in the right directory?"
+  ##JH   fi
+  ##JH 
+  ##JH   upload_file
+  ##JH 
+  ##JH fi
+}
 
-    if ! has_user ; then
-      THE_USER="$(whoami)"
-    elif ! has_server ; then
-      usage "Where are we sending the file? Please specify a target server hostname."
-    elif ! has_file ; then
-      usage "What are we uploading? Please specifie a file to upload."
-    elif [[ ! -f "${THE_FILE}" ]]; then
-      usage "I can't find file: ${THE_FILE}. Are you in the right directory?"
+
+function check_domain() {
+  # manages domain specification
+
+  if [[ -z "${THE_DOMAIN}" ]]; then
+    local User_Input=""
+    show_prompt "No domain is hard-coded. Continue without a specified domain (y/n)?"
+    local ysno="${User_Input}"; User_Input=""
+
+    if [[ "${ysno}" != 'y' ]]; then
+      show_prompt "Specify domain with preceding \".\" (type 'EXIT' or 'CTRL+c' to quit)"
+      if [[ "${User_Input}" != "EXIT" ]]; then
+        THE_DOMAIN="${User_Input}"; unset User_Input
+      else
+        usage "Quitting with no domain!"
+      fi
     fi
-
-    upload_file
 
   fi
 }
@@ -172,7 +210,8 @@ function opt_2_actions() {
 function main() {
   # The main event
 
-  THE_DOMAIN=""
+  THE_DOMAIN=""  ## Include the "." before the domain name
+  check_domain
   THE_USER=""
   THE_SERVER=""
   TARGET_DIR=':'
