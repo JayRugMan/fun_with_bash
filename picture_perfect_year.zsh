@@ -42,10 +42,28 @@ function get_pic_info() {
     # Assumes the earlier of the two dates is the most acurate
     if [[ "${pic_ext_array_other[@]}" =~ ${file_type:l} ]] || ${no_exif} ; then
       the_y_a="$(identify -verbose "$the_file" 2>/dev/null |
-               awk -F'( |-){1,}' '/date:create:/ {print $3}'
+               awk -F'( |-){1,}' -v today="$(date +%Y)" '
+                BEGIN{
+                  the_date=today
+                };
+                /date:create:/ {
+                  if($3<the_date) the_date=$3
+                };
+                END{
+                  print the_date
+                }'
               )"  # Gets "creation" year
       the_y_b="$(identify -verbose "$the_file" 2>/dev/null |
-               awk -F'( |-){1,}' '/date:modify:/ {print $3}'
+               awk -F'( |-){1,}' -v today="$(date +%Y)" '
+                BEGIN{
+                  the_date=today
+                };
+                /date:modify:/ {
+                  if($3<the_date) the_date=$3
+                };
+                END{
+                  print the_date
+                }'
               )"  # Gets "modification" year
       if [[ ${the_y_a} -lt ${the_y_b} ]]; then
         the_y=${the_y_a}
