@@ -1,7 +1,7 @@
 # List of icons
 
 
-Generated with the following pyton3 code:
+Generated with the following python3 code:
 ```python
 import codecs
 
