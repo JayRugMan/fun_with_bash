@@ -66,8 +66,12 @@ function show_prompt() {
 function get_hash () 
 { 
     local the_f="${1}"; shift                    # The file
-    local the_h="'$(sha256sum "${the_f}")'";  # The hash
-    echo "sha256sum -c -<<<${the_h}"
+    local full_p="realpath ${the_f}"             # Full path of file
+    local full_h="$(sha256sum ${full_p})"        # Hash and file
+    local just_h="${full_h%% *}"                 # Just the hash
+    local file_basename="$(basename ${the_f})"   # Just the base filename
+
+    echo "sha256sum -c -<<<'${just_h}  ${file_basename}'"
 }
 
 
