@@ -16,5 +16,6 @@ sourcepermFile="$HOME/${homedir##*/}_$(date +%y%m%d_%H%M).file" # file for sourc
 # in context of the chmod command and directs the constructed chmod command
 # to the sourcepermFile to be sourced to restore permissions
 find . -exec stat -c"chmod %a \"$homedir/%n\" 2>/dev/null" {} + | sed 's/\/\.\//\//g; s/\/\."/"/g' > ${sourcepermFile}
+sed -i 's/^chmod [0-7][0-7][0-7] /00&/g; s/^00chmod /chmod 00/g' ${sourcepermFile}
 
 echo -e "\nsource $sourcepermFile as root to restore mod bits for files in $homedir\n"
