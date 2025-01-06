@@ -3,8 +3,8 @@
 # Created by Jason Hardman
 # Date 20210818
 # creates a file that can be sourced which records ownership and permissions
-# of a file structure in Linux per the deptch specified
-# Unlike earlier versions, this script does work with stick or Special bits
+# of a file structure in Linux per the depth specified
+# Unlike earlier versions, this script does work with sticky or Special bits
 
 
 function usage() {
