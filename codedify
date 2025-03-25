@@ -1,0 +1,13 @@
+#!/bin/bash
+# This script opens the current working directory in VSCode
+
+# Only runs in GUI environment
+if [ -z "$DISPLAY" ] && [ -z "WAYLAND_DISPLAY" ]; then
+  echo "Error: This script requires a GUI environment (IE X11 or Wayland)." >&2
+  exit 1
+fi
+
+vscode_path="/usr/bin/code"  # VSCode executable's path
+dir="${1:-$(pwd)}"           # Current dir if no arg is provided
+
+nohup "${vscode_path}" "${dir}" >/dev/null 2>&1 &
