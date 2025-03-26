@@ -1,0 +1,13 @@
+#!/bin/bash
+# opens the working or specified directory in dolphin
+
+# Check if running in a GUI environment
+if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ] || [ -n "$SSH_CONNECTION" ]; then
+  echo "Error: This script requires a local GUI environment." >&2
+  exit 1
+fi
+
+dolphin_exec="/usr/bin/dolphin"
+dir="${1:-$(pwd)}"
+
+nohup "${dolphin_exec}" "${dir}" >/dev/null 2>&1 &
