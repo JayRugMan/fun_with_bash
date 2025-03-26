@@ -2,8 +2,8 @@
 # This script opens the current working directory in VSCode
 
 # Only runs in GUI environment
-if [ -z "$DISPLAY" ] && [ -z "WAYLAND_DISPLAY" ]; then
-  echo "Error: This script requires a GUI environment (IE X11 or Wayland)." >&2
+if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ] || [ -n "$SSH_CONNECTION" ]; then
+  echo "Error: This script requires a local GUI environment." >&2
   exit 1
 fi
 
