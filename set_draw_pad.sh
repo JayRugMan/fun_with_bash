@@ -34,6 +34,8 @@ if [[ "${monitor_count}" -gt 1 ]]; then
   echo "-- Mapped to Monitor ${chosen_monitor}"
 fi
 
+xsetwacom set "${stylus_clean}" Button 2 "button 3" && \
+echo "-- Stylus button 2 set to right-click (button 3)"
 xsetwacom set "${stylus_clean}" Button 3 "key Ctrl z" && \
 echo "-- Stylus button 3 set to Undo (Ctrl+z)" || \
 echo "-- Stylus button 3 failed to set"
