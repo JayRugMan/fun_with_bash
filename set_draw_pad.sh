@@ -5,8 +5,8 @@
 sleep 2
 
 # Get devices if they exist
-my_stylus="$(xsetwacom --list devices | awk -F'\t' '/type: STYLUS/ {print $1 }')"
-my_pad="$(xsetwacom --list devices | awk -F'\t' '/type: PAD/ {print $1 }')"
+my_stylus="$(xsetwacom --list devices | awk -F'\t' '/Intuos/ && /type: STYLUS/ {print $1 }')"
+my_pad="$(xsetwacom --list devices | awk -F'\t' '/Intuos/ && /type: PAD/ {print $1 }')"
 
 # Test if devices exist
 if [[ -z "${my_stylus}" ]] || [[ -z "${my_pad}" ]] ; then
