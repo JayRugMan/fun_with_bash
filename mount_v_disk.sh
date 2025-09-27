@@ -15,7 +15,7 @@ EOF
 function setup() {
   disk="${1}"; shift
   echo "---- Getting info for ${disk}"
-  info="$(qemu-img info "${disk}")" || usage "    Disk File \"${disk}\" Not found. Exiting."
+  info="$(qemu-img info "${disk}")" || usage "Disk File \"${disk}\" Not found. Exiting."
   fmat="$(echo "${info}" | awk '/^file format:/{print $3}')"
   echo "---- Connecting ${disk} to /dev/nbd0 as ${fmat}"
   qemu-nbd --connect=/dev/nbd0 "${disk}" --format=${fmat}
@@ -54,7 +54,7 @@ function setup() {
 function cleanup() {
   disk="$(ps aux | grep qemu-nbd | grep -Eo 'connect.*$' | cut -d " " -f 2)"
   echo "---- Cleaning up mounts for ${disk}"
-  mounts=( $(lsblk /dev/nbd0 | awk '!/NAME/ {if ($7!="") print $7}') )
+  mounts=( $(lsblk /dev/nbd0 |  awk '!/NAME/ {if (NF > max_nf) {max_nf = NF; last_fields = $NF} else if (NF == max_nf) {last_fields = last_fields ORS $NF}}; END {print last_fields}' | sort -u) )
   if [[ ${#mounts[@]} -gt 0 ]]; then
     for mnt in ${mounts[@]}; do
       echo "---- Unmounting ${mnt}"
@@ -64,7 +64,13 @@ function cleanup() {
     usage "No mounts found"
   fi
   volume_group=$(vgdisplay --config 'devices { filter = [ "a|/dev/nbd0|", "r|.*|" ] }' | awk '/VG Name/ {print $3}' | head -n 1)
-  if [[ "$(lsblk /dev/nbd0 | awk '!/NAME/ {if ($7!="") print $7}')" == "" ]]; then
+  mounts_cleared=true
+  for mnt in ${mounts[@]}; do
+    if mount | grep -q "${mnt}"; then
+      mounts_cleared=false
+    fi
+  done
+  if ${mounts_cleared}; then
     echo "---- Deactivating Volume Group \"${volume_group}\""
     vgchange -an ${volume_group} --config 'devices { filter = [ "a|/dev/nbd0|", "r|.*|" ] }'
     echo "---- Disconnecting ${disk} from /dev/nbd0"
