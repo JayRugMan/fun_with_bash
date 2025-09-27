@@ -21,7 +21,7 @@ function setup() {
   qemu-nbd --connect=/dev/nbd0 "${disk}" --format=${fmat}
   blk_dev="$(lsblk | awk 'BEGIN{hold=""}; /nbd0/ {hold=$1}; END{print hold}' | sed 's/└─//g')"
   ##JHdisk_type="$(fdisk -l /dev/nbd0 | awk 'BEGIN{hold=""}; /nbd0/ {hold=$NF}; END{print hold}')"
-  disk_type="$(blkid /dev/nbd0 | awk 'BEGIN{FS="TYPE=|\""}; {print $5}')"
+  disk_type="$(blkid /dev/${blk_dev} | awk 'BEGIN{FS="TYPE=|\""}; {print $5}')"
   if [[ "${disk_type}" == "LVM2_member" ]]; then
     echo "---- LVM, scanning for physical volumes"
     pvscan --cache /dev/${blk_dev} --config 'devices { filter = [ "a|/dev/nbd0|", "r|.*|" ] }'
