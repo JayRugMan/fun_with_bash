@@ -12,6 +12,19 @@ EOF
   exit 1
 }
 
+function check_nbd_init() {
+  echo " ---- Checking for nbd kernel module"
+  if [[ ! -b /dev/nbd0 ]]; then
+    echo "---- Module not loaded. Loading nbd kernel module"
+    modprobe nbd max_part=8
+    if [[ ! -b /dev/nbd0 ]]; then
+      usage "/dev/nbd0 not found, exiting"
+    fi
+  else
+    echo "---- Module already loaded"
+  fi
+}
+
 function setup() {
   disk="${1}"; shift
   echo "---- Getting info for ${disk}"
@@ -82,6 +95,7 @@ function cleanup() {
 }
 
 function main() {
+  check_nbd_init
   action="${1}"; shift
   case "${action}" in
     "setup" )
