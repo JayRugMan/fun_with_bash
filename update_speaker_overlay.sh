@@ -41,7 +41,7 @@ main() {
 
   # remove old link and file if it exists
   if [[ -h "${the_link}" ]] ; then
-    local link_full_path="$(realpath ${the_link})"  # absolute it incase it's relative
+    local link_full_path="$(realpath -s ${the_link})"  # absolute it incase it's relative
     local old_file_full="$(realpath "$(readlink "${link_full_path}")")"
     echo "Unlinking ${old_file_full} from ${link_full_path}"
     unlink "${link_full_path}"
